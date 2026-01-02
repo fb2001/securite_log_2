@@ -1,0 +1,15 @@
+# Typescript
+node_modules/
+dist/
+
+# Generated code
+src/lib/*.ts
+src/lib/*.interp
+src/lib/*.tokens
+!src/lib/SmaliPrinter.ts
+!src/lib/SmaliWriter.ts
+!src/lib/AndroidManifest.ts
+
+# Working file
+app/
+/*.smali
