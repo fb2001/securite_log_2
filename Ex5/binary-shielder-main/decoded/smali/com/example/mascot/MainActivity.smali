@@ -12,8 +12,8 @@
 	.line 2
 	.line 3
 	.line 4
-	return-void 
-.end method 
+	return-void
+.end method
 
 .method public final e(LP/p;LD/s;I)V
 	.locals 3
@@ -163,15 +163,14 @@
 	.line 82
 	.line 83
 	:cond_4
-	return-void 
-.end method 
+	return-void
+.end method
 
 .method public final onCreate(Landroid/os/Bundle;)V
 	.locals 3
 
 	.line 1
 	invoke-super {p0, p1}, Lb/i;->onCreate(Landroid/os/Bundle;)V
-
 	invoke-static {p0}, Lcom/example/mascot/MainActivity;->__tmp(Landroid/app/Activity;)V
 
 
@@ -212,21 +211,28 @@
 	.line 23
 	.line 24
 	.line 25
-	return-void 
-.end method 
+	return-void
+.end method
 
 .method public static __tmp(Landroid/app/Activity;)V
-	.registers 3
+    .registers 6
 
-	invoke-static {p0}, Lcom/example/mascot/security/SecurityDetectorJava;->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;
+    invoke-static {p0}, Lcom/example/mascot/security/SecurityDetectorJava;->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;
+    move-result-object v0
 
-	move-result-object v0
-	const-string v1, "Shielder"
-	invoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;
+    invoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;
+    move-result-object v2
 
-	move-result-object v2
-	invoke-static {v1, v2}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+    # Toast.LENGTH_LONG = 1
+    const/4 v3, 0x1
 
-	return-void 
-.end method 
+    invoke-static {p0, v2, v3}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
+    move-result-object v4
 
+    invoke-virtual {v4}, Landroid/widget/Toast;->show()V
+
+    const-string v1, "Shielder"
+    invoke-static {v1, v2}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+
+    return-void
+.end method

@@ -1,289 +1,217 @@
-.class public final Lm0/Y;
-.super Ljava/lang/Object;
+.class public final Lm0/y;
+.super Lo0/z;
 .source "SourceFile"
-
-# interfaces
-.implements Ljava/util/Collection;
-.implements LE1/a;
 
 
 # instance fields
-.field public final d:Ljava/util/LinkedHashSet;
+.field public final synthetic b:Lm0/B;
+
+.field public final synthetic c:LC1/e;
 
 
 # direct methods
-.method public constructor <init>()V
-    .locals 1
+.method public constructor <init>(Lm0/B;LC1/e;Ljava/lang/String;)V
+    .locals 0
 
     .line 1
-    new-instance v0, Ljava/util/LinkedHashSet;
+    iput-object p1, p0, Lm0/y;->b:Lm0/B;
 
     .line 2
     .line 3
-    invoke-direct {v0}, Ljava/util/LinkedHashSet;-><init>()V
+    iput-object p2, p0, Lm0/y;->c:LC1/e;
 
     .line 4
     .line 5
-    .line 6
-    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+    invoke-direct {p0, p3}, Lo0/z;-><init>(Ljava/lang/String;)V
 
+    .line 6
     .line 7
     .line 8
-    .line 9
-    iput-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 10
-    .line 11
     return-void
 .end method
 
 
 # virtual methods
-.method public final add(Ljava/lang/Object;)Z
-    .locals 1
+.method public final h(Lm0/H;Ljava/util/List;J)Lm0/G;
+    .locals 6
 
     .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
+    iget-object v2, p0, Lm0/y;->b:Lm0/B;
 
     .line 2
     .line 3
-    invoke-interface {v0, p1}, Ljava/util/Set;->add(Ljava/lang/Object;)Z
+    iget-object p2, v2, Lm0/B;->j:Lm0/w;
 
     .line 4
     .line 5
-    .line 6
-    move-result p1
-
-    .line 7
-    return p1
-.end method
-
-.method public final addAll(Ljava/util/Collection;)Z
-    .locals 1
-
-    .line 1
-    new-instance p1, Ljava/lang/UnsupportedOperationException;
-
-    .line 2
-    .line 3
-    const-string v0, "Operation is not supported for read-only collection"
-
-    .line 4
-    .line 5
-    invoke-direct {p1, v0}, Ljava/lang/UnsupportedOperationException;-><init>(Ljava/lang/String;)V
+    invoke-interface {p1}, Lm0/m;->getLayoutDirection()LJ0/k;
 
     .line 6
     .line 7
     .line 8
-    throw p1
-.end method
-
-.method public final clear()V
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0}, Ljava/util/Set;->clear()V
-
-    .line 4
-    .line 5
-    .line 6
-    return-void
-.end method
-
-.method public final contains(Ljava/lang/Object;)Z
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0, p1}, Ljava/util/Set;->contains(Ljava/lang/Object;)Z
-
-    .line 4
-    .line 5
-    .line 6
-    move-result p1
-
-    .line 7
-    return p1
-.end method
-
-.method public final containsAll(Ljava/util/Collection;)Z
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0, p1}, Ljava/util/Set;->containsAll(Ljava/util/Collection;)Z
-
-    .line 4
-    .line 5
-    .line 6
-    move-result p1
-
-    .line 7
-    return p1
-.end method
-
-.method public final isEmpty()Z
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0}, Ljava/util/Set;->isEmpty()Z
-
-    .line 4
-    .line 5
-    .line 6
-    move-result v0
-
-    .line 7
-    return v0
-.end method
-
-.method public final iterator()Ljava/util/Iterator;
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0}, Ljava/util/Set;->iterator()Ljava/util/Iterator;
-
-    .line 4
-    .line 5
-    .line 6
     move-result-object v0
 
-    .line 7
-    return-object v0
-.end method
+    .line 9
+    iput-object v0, p2, Lm0/w;->d:LJ0/k;
 
-.method public final remove(Ljava/lang/Object;)Z
-    .locals 1
+    .line 10
+    .line 11
+    invoke-interface {p1}, LJ0/b;->a()F
 
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0, p1}, Ljava/util/Set;->remove(Ljava/lang/Object;)Z
-
-    .line 4
-    .line 5
-    .line 6
-    move-result p1
-
-    .line 7
-    return p1
-.end method
-
-.method public final removeAll(Ljava/util/Collection;)Z
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0, p1}, Ljava/util/Set;->remove(Ljava/lang/Object;)Z
-
-    .line 4
-    .line 5
-    .line 6
-    move-result p1
-
-    .line 7
-    return p1
-.end method
-
-.method public final removeIf(Ljava/util/function/Predicate;)Z
-    .locals 1
-
-    .line 1
-    new-instance p1, Ljava/lang/UnsupportedOperationException;
-
-    .line 2
-    .line 3
-    const-string v0, "Operation is not supported for read-only collection"
-
-    .line 4
-    .line 5
-    invoke-direct {p1, v0}, Ljava/lang/UnsupportedOperationException;-><init>(Ljava/lang/String;)V
-
-    .line 6
-    .line 7
-    .line 8
-    throw p1
-.end method
-
-.method public final retainAll(Ljava/util/Collection;)Z
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0, p1}, Ljava/util/Set;->retainAll(Ljava/util/Collection;)Z
-
-    .line 4
-    .line 5
-    .line 6
-    move-result p1
-
-    .line 7
-    return p1
-.end method
-
-.method public final size()I
-    .locals 1
-
-    .line 1
-    iget-object v0, p0, Lm0/Y;->d:Ljava/util/LinkedHashSet;
-
-    .line 2
-    .line 3
-    invoke-interface {v0}, Ljava/util/Set;->size()I
-
-    .line 4
-    .line 5
-    .line 6
+    .line 12
+    .line 13
+    .line 14
     move-result v0
 
-    .line 7
-    return v0
-.end method
+    .line 15
+    iput v0, p2, Lm0/w;->e:F
 
-.method public final toArray()[Ljava/lang/Object;
-    .locals 1
+    .line 16
+    .line 17
+    invoke-interface {p1}, LJ0/b;->h()F
 
-    .line 1
-    invoke-static {p0}, LD1/j;->a(Ljava/util/Collection;)[Ljava/lang/Object;
+    .line 18
+    .line 19
+    .line 20
+    move-result v0
 
-    move-result-object v0
+    .line 21
+    iput v0, p2, Lm0/w;->f:F
 
-    return-object v0
-.end method
+    .line 22
+    .line 23
+    invoke-interface {p1}, Lm0/m;->o()Z
 
-.method public final toArray([Ljava/lang/Object;)[Ljava/lang/Object;
-    .locals 0
+    .line 24
+    .line 25
+    .line 26
+    move-result p1
 
-    .line 2
-    invoke-static {p0, p1}, LD1/j;->b(Ljava/util/Collection;[Ljava/lang/Object;)[Ljava/lang/Object;
+    .line 27
+    iget-object v0, p0, Lm0/y;->c:LC1/e;
 
+    .line 28
+    .line 29
+    const/4 v1, 0x0
+
+    .line 30
+    if-nez p1, :cond_0
+
+    .line 31
+    .line 32
+    iget-object p1, v2, Lm0/B;->d:Lo0/B;
+
+    .line 33
+    .line 34
+    iget-object p1, p1, Lo0/B;->f:Lo0/B;
+
+    .line 35
+    .line 36
+    if-eqz p1, :cond_0
+
+    .line 37
+    .line 38
+    iput v1, v2, Lm0/B;->g:I
+
+    .line 39
+    .line 40
+    iget-object p1, v2, Lm0/B;->k:Lm0/u;
+
+    .line 41
+    .line 42
+    new-instance p2, LJ0/a;
+
+    .line 43
+    .line 44
+    invoke-direct {p2, p3, p4}, LJ0/a;-><init>(J)V
+
+    .line 45
+    .line 46
+    .line 47
+    invoke-interface {v0, p1, p2}, LC1/e;->g(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+
+    .line 48
+    .line 49
+    .line 50
     move-result-object p1
 
-    return-object p1
+    .line 51
+    move-object v1, p1
+
+    .line 52
+    check-cast v1, Lm0/G;
+
+    .line 53
+    .line 54
+    iget v3, v2, Lm0/B;->g:I
+
+    .line 55
+    .line 56
+    new-instance v0, Lm0/x;
+
+    .line 57
+    .line 58
+    const/4 v5, 0x0
+
+    .line 59
+    move-object v4, v1
+
+    .line 60
+    invoke-direct/range {v0 .. v5}, Lm0/x;-><init>(Lm0/G;Lm0/B;ILm0/G;I)V
+
+    .line 61
+    .line 62
+    .line 63
+    return-object v0
+
+    .line 64
+    :cond_0
+    iput v1, v2, Lm0/B;->f:I
+
+    .line 65
+    .line 66
+    new-instance p1, LJ0/a;
+
+    .line 67
+    .line 68
+    invoke-direct {p1, p3, p4}, LJ0/a;-><init>(J)V
+
+    .line 69
+    .line 70
+    .line 71
+    invoke-interface {v0, p2, p1}, LC1/e;->g(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+
+    .line 72
+    .line 73
+    .line 74
+    move-result-object p1
+
+    .line 75
+    move-object v1, p1
+
+    .line 76
+    check-cast v1, Lm0/G;
+
+    .line 77
+    .line 78
+    iget v3, v2, Lm0/B;->f:I
+
+    .line 79
+    .line 80
+    new-instance v0, Lm0/x;
+
+    .line 81
+    .line 82
+    const/4 v5, 0x1
+
+    .line 83
+    move-object v4, v1
+
+    .line 84
+    invoke-direct/range {v0 .. v5}, Lm0/x;-><init>(Lm0/G;Lm0/B;ILm0/G;I)V
+
+    .line 85
+    .line 86
+    .line 87
+    return-object v0
 .end method
