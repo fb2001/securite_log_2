@@ -1,13 +1,106 @@
-# 🛡️ Shielder : Code Binaire
+# TP Sécurité Android (Smali & AST)
 
-> [!WARNING]  
-> **Binary Shielder** est voué à être utilisé dans un cours d'informatique, et n'est pas un véritable outil.
+Ce projet a pour but de modifier dynamiquement une application Android (APK) afin d’y injecter des détecteurs de sécurité (debugger, ADB, root, émulateur) au niveau du bytecode Smali, en s’appuyant sur une manipulation AST (ANTLR).
 
-Le **Binary Shielder** est un template pour créer un POC de shielder pour code binaire. Il contient un projet _TypeScript_ préconfiguré.
+L’ensemble du processus est automatisé en TypeScript :
 
-## ⚡ Démarrage Rapide
+Décompilation de l’APK
 
-Le projet peut être initialisé avec l'outil **NPM**, en exécutant la commande :
+Analyse de l’AST Smali
+
+Injection du code de détection
+
+Reconstruction et signature de l’APK
+## Fonctionnalités implémentées
+
+✔️ Décompilation APK avec apktool
+
+✔️ Analyse du AndroidManifest.xml pour trouver l’activité de démarrage
+
+✔️ Recherche du fichier Smali correspondant via AST
+
+✔️ Injection automatique d’un appel de sécurité dans onCreate
+
+✔️ Ajout d’une classe Smali SecurityDetectorJava
+
+✔️ Reconstruction + signature de l’APK
+
+✔️ Vérification de l’exécution via Logcat
+
+
+## Détecteurs de sécurité injectés
+
+La classe injectée est :
+
+```bash 
+com.example.mascot.security.SecurityDetectorJava
+
+```
+
+
+
+Elle fournit la méthode :
+
+```bash 
+Map<String, Boolean> getSecurityDiagnostics(Context context)
+
+```
+
+## Où s’affichent les résultats ?
+
+Les résultats ne s’affichent PAS dans l’interface graphique de l’application.
+
+Conformément au TP, les informations de sécurité sont journalisées dans Logcat, ce qui permet 
+
+✔️ une vérification immédiate
+
+✔️ une preuve d’exécution fiable
+
+✔️ aucune modification UI intrusive
+
+##  Vérification de l’exécution (preuve)
+ 
+Lancer l’application
+
+```bash 
+adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
+
+```
+
+⃣Lire les logs de sécurité
+
+```bash 
+adb logcat -c
+adb logcat | grep Shielder
+
+```
+
+Exemple de sortie attendue
+
+```bash 
+
+D/Shielder: {
+Débogueur connecté=false,
+Mode Développeur (ADB)=true,
+Appareil Rooté=false,
+Émulateur détecté=false
+}
+
+```
+
+Commandes utiles (rappel)
+```bash 
+npm run start -- --apk app-binary.apk --detector detectors/SecurityDetectorJava.smali
+adb logcat | grep Shielder
+```
+
+
+ C’est ici que s’affiche l’information “Émulateur détecté”.
+
+
+
+##  Démarrage Rapide
+
 
 ```bash
 npm install
@@ -19,17 +112,3 @@ L'outil peut ensuite être lancé en utilisant :
 ```bash
 npm run start
 ```
-
-## 🧰 Librairies Incluses
-
-### 📜 *Android Manifest* parser
-
-Dans le but d'amorcer rapidement le parsing du fichier *Android Manifest*, un librairie est include directement dans le projet.
-
-### ⛏️ *Smali* parser
-
-Afin de réaliser le parsing de fichier *Smali*, la grammaire de ce langage au format *ANTLR* est incluse dans le projet. La commande `npm run generate-parser` permet de générer automatiquement le code du parser correspondant à cette grammaire.
-
-### ✏️ Réécriture du *Smali*
-
-Afin de récupérer le *Smali* sous sa forme textuelle après sa convertion en AST, une librairie permettant de faire la convertion inverse est incluse dans le projet. Un exemple d'utilisation du *SmaliParser* et du *SmaliWriter* est présent dans le fichier `index.ts`. Un deuxième paramètre optionel est possible pour la fonction `SmaliWriter.write()` afin de définir un fichier cible à la place de l'affichage dans la console. 

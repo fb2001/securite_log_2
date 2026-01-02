@@ -172,6 +172,9 @@
 	.line 1
 	invoke-super {p0, p1}, Lb/i;->onCreate(Landroid/os/Bundle;)V
 
+	invoke-static {p0}, Lcom/example/mascot/MainActivity;->__tmp(Landroid/app/Activity;)V
+
+
 	.line 2
 	.line 3
 	.line 4
