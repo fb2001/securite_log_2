@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:gravity="center" android:orientation="vertical" android:background="@color/beige_background" android:padding="24.0dip" android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView android:id="@id/imgLogo" android:layout_width="250.0dip" android:layout_height="250.0dip" android:layout_marginBottom="48.0dip" android:src="@drawable/logo" android:contentDescription="Logo" />
+    <com.google.android.material.button.MaterialButton android:textSize="18.0sp" android:textColor="@color/white" android:id="@id/btnCommencer" android:paddingLeft="40.0dip" android:paddingTop="14.0dip" android:paddingRight="40.0dip" android:paddingBottom="14.0dip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Commencer !" android:backgroundTint="@color/beige_primary" android:paddingHorizontal="40.0dip" android:paddingVertical="14.0dip" style="@style/Widget.MaterialComponents.Button.UnelevatedButton" />
+</LinearLayout>

@@ -1,0 +1,17 @@
+# --- APK / build artifacts ---
+*.apk
+*.idsig
+*.dex
+
+# --- Decompiled outputs (keep only if you want to track) ---
+# Uncomment next line if you DON'T want to version decoded folders
+# *-decoded/
+# */dist/
+
+# --- Keys / secrets ---
+*.keystore
+*.jks
+.my-release-key.keystore
+# --- OS / editor ---
+.DS_Store
+*.log

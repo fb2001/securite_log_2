@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Mascot</string>
+
+    <!-- MainActivity -->
+    <string name="logo_desc">Logo de l\'application</string>
+    <string name="btn_commencer">Commencer !</string>
+
+    <!-- MascotActivity -->
+    <string name="quiz_title">Qui est cette mascotte ?</string>
+    <string name="mascot_desc">Image de la mascotte</string>
+    <string name="hint_nom">Nom de la mascotte</string>
+    <string name="hint_represente">Que représente-t-elle ?</string>
+    <string name="btn_valider">Valider</string>
+
+    <!-- ResultActivity -->
+    <string name="result_desc">Icône de résultat</string>
+    <string name="result_message">Message de résultat</string>
+    <string name="btn_recommencer">Recommencer</string>
+</resources>

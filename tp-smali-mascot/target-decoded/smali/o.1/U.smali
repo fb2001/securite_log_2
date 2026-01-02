@@ -1,0 +1,49 @@
+.class public final Lo/U;
+.super LP/o;
+.source "SourceFile"
+
+# interfaces
+.implements Lo0/q0;
+
+
+# static fields
+.field public static final r:Lo/a;
+
+
+# instance fields
+.field public q:Z
+
+
+# direct methods
+.method static constructor <clinit>()V
+    .locals 1
+
+    .line 1
+    new-instance v0, Lo/a;
+
+    .line 2
+    .line 3
+    invoke-direct {v0}, Ljava/lang/Object;-><init>()V
+
+    .line 4
+    .line 5
+    .line 6
+    sput-object v0, Lo/U;->r:Lo/a;
+
+    .line 7
+    .line 8
+    return-void
+.end method
+
+
+# virtual methods
+.method public final k()Ljava/lang/Object;
+    .locals 1
+
+    .line 1
+    sget-object v0, Lo/U;->r:Lo/a;
+
+    .line 2
+    .line 3
+    return-object v0
+.end method
