@@ -48,15 +48,7 @@ Map<String, Boolean> getSecurityDiagnostics(Context context)
 
 ## Où s’affichent les résultats ?
 
-Les résultats ne s’affichent PAS dans l’interface graphique de l’application.
-
-Conformément au TP, les informations de sécurité sont journalisées dans Logcat, ce qui permet 
-
-✔️ une vérification immédiate
-
-✔️ une preuve d’exécution fiable
-
-✔️ aucune modification UI intrusive
+Les résultats s’affichent  dans l’interface graphique de l’application sous forme Toast ainsi que logcat.
 
 ##  Vérification de l’exécution (preuve)
  
