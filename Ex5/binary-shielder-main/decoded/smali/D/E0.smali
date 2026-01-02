@@ -139,6 +139,14 @@
     .line 55
     move-result-object v0
 
+    const/high16 v01, 0x10000000
+    invoke-virtual {v2, v01}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
+
+
+
+    const/high16 v01, 0x10000000
+    invoke-virtual {v2, v01}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
+
     .line 56
     invoke-virtual {v0, v2}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
 

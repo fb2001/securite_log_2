@@ -16,3 +16,8 @@ function run(cmd: string, args: string[]): Promise<void> {
 export async function apktoolDecode(apkPath: string, outDir: string) {
 	await run("apktool", ["d", "-f", apkPath, "-o", outDir]);
 }
+export async function apktoolBuild(decodedDir: string, outApk: string) {
+	// apktool b <dossier> -o <apk>
+	await run("apktool", ["b", decodedDir, "-o", outApk]);
+}
+

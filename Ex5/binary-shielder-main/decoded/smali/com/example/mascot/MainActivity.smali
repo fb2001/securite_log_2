@@ -1,258 +1,229 @@
 .class public final Lcom/example/mascot/MainActivity;
 .super Lb/i;
 .source "SourceFile"
-
-
-# static fields
 .field public static final synthetic u:I
 
-
-# direct methods
 .method public constructor <init>()V
-    .locals 0
+	.locals 0
 
-    .line 1
-    invoke-direct {p0}, Lb/i;-><init>()V
+	.line 1
+	invoke-direct {p0}, Lb/i;-><init>()V
 
-    .line 2
-    .line 3
-    .line 4
-    return-void
-.end method
+	.line 2
+	.line 3
+	.line 4
+	return-void 
+.end method 
 
-
-# virtual methods
 .method public final e(LP/p;LD/s;I)V
-    .locals 3
+	.locals 3
 
-    .line 1
-    const v0, 0x2a8bfe34
+	.line 1
+	const v0, 0x2a8bfe34
+	.line 2
+	.line 3
+	.line 4
+	invoke-virtual {p2, v0}, LD/s;->V(I)LD/s;
 
-    .line 2
-    .line 3
-    .line 4
-    invoke-virtual {p2, v0}, LD/s;->V(I)LD/s;
+	.line 5
+	.line 6
+	.line 7
+	invoke-virtual {p2, p1}, LD/s;->f(Ljava/lang/Object;)Z
 
-    .line 5
-    .line 6
-    .line 7
-    invoke-virtual {p2, p1}, LD/s;->f(Ljava/lang/Object;)Z
+	.line 8
+	.line 9
+	.line 10
+	move-result v0
+	.line 11
+	if-eqz v0, :cond_0
+	.line 12
+	.line 13
+	const/4 v0, 0x4
+	.line 14
+	goto :goto_0
+	.line 15
+	:cond_0
+	const/4 v0, 0x2
+	.line 16
+	:goto_0
+	or-int/2addr v0, p3
+	.line 17
+	invoke-virtual {p2, p0}, LD/s;->h(Ljava/lang/Object;)Z
 
-    .line 8
-    .line 9
-    .line 10
-    move-result v0
+	.line 18
+	.line 19
+	.line 20
+	move-result v1
+	.line 21
+	if-eqz v1, :cond_1
+	.line 22
+	.line 23
+	const/16 v1, 0x20
+	.line 24
+	.line 25
+	goto :goto_1
+	.line 26
+	:cond_1
+	const/16 v1, 0x10
+	.line 27
+	.line 28
+	:goto_1
+	or-int/2addr v0, v1
+	.line 29
+	and-int/lit8 v1, v0, 0x13
+	.line 30
+	.line 31
+	const/16 v2, 0x12
+	.line 32
+	.line 33
+	if-eq v1, v2, :cond_2
+	.line 34
+	.line 35
+	const/4 v1, 0x1
+	.line 36
+	goto :goto_2
+	.line 37
+	:cond_2
+	const/4 v1, 0x0
+	.line 38
+	:goto_2
+	and-int/lit8 v2, v0, 0x1
+	.line 39
+	.line 40
+	invoke-virtual {p2, v2, v1}, LD/s;->M(IZ)Z
 
-    .line 11
-    if-eqz v0, :cond_0
+	.line 41
+	.line 42
+	.line 43
+	move-result v1
+	.line 44
+	if-eqz v1, :cond_3
+	.line 45
+	.line 46
+	new-instance v1, Lo1/d;
+	.line 47
+	.line 48
+	const/4 v2, 0x1
+	.line 49
+	invoke-direct {v1, p0, v2}, Lo1/d;-><init>(Lb/i;I)V
 
-    .line 12
-    .line 13
-    const/4 v0, 0x4
+	.line 50
+	.line 51
+	.line 52
+	const v2, -0x55e9b52
+	.line 53
+	.line 54
+	.line 55
+	invoke-static {v2, v1, p2}, LL/i;->d(ILq1/c;LD/s;)LL/d;
 
-    .line 14
-    goto :goto_0
+	.line 56
+	.line 57
+	.line 58
+	move-result-object v1
+	.line 59
+	and-int/lit8 v0, v0, 0xe
+	.line 60
+	.line 61
+	or-int/lit8 v0, v0, 0x30
+	.line 62
+	.line 63
+	invoke-static {p1, v1, p2, v0}, Lo1/b;->a(LP/p;LL/d;LD/s;I)V
 
-    .line 15
-    :cond_0
-    const/4 v0, 0x2
+	.line 64
+	.line 65
+	.line 66
+	goto :goto_3
+	.line 67
+	:cond_3
+	invoke-virtual {p2}, LD/s;->P()V
 
-    .line 16
-    :goto_0
-    or-int/2addr v0, p3
+	.line 68
+	.line 69
+	.line 70
+	:goto_3
+	invoke-virtual {p2}, LD/s;->r()LD/C0;
 
-    .line 17
-    invoke-virtual {p2, p0}, LD/s;->h(Ljava/lang/Object;)Z
+	.line 71
+	.line 72
+	.line 73
+	move-result-object p2
+	.line 74
+	if-eqz p2, :cond_4
+	.line 75
+	.line 76
+	new-instance v0, LD/v;
+	.line 77
+	.line 78
+	invoke-direct {v0, p0, p1, p3}, LD/v;-><init>(Lcom/example/mascot/MainActivity;LP/p;I)V
 
-    .line 18
-    .line 19
-    .line 20
-    move-result v1
-
-    .line 21
-    if-eqz v1, :cond_1
-
-    .line 22
-    .line 23
-    const/16 v1, 0x20
-
-    .line 24
-    .line 25
-    goto :goto_1
-
-    .line 26
-    :cond_1
-    const/16 v1, 0x10
-
-    .line 27
-    .line 28
-    :goto_1
-    or-int/2addr v0, v1
-
-    .line 29
-    and-int/lit8 v1, v0, 0x13
-
-    .line 30
-    .line 31
-    const/16 v2, 0x12
-
-    .line 32
-    .line 33
-    if-eq v1, v2, :cond_2
-
-    .line 34
-    .line 35
-    const/4 v1, 0x1
-
-    .line 36
-    goto :goto_2
-
-    .line 37
-    :cond_2
-    const/4 v1, 0x0
-
-    .line 38
-    :goto_2
-    and-int/lit8 v2, v0, 0x1
-
-    .line 39
-    .line 40
-    invoke-virtual {p2, v2, v1}, LD/s;->M(IZ)Z
-
-    .line 41
-    .line 42
-    .line 43
-    move-result v1
-
-    .line 44
-    if-eqz v1, :cond_3
-
-    .line 45
-    .line 46
-    new-instance v1, Lo1/d;
-
-    .line 47
-    .line 48
-    const/4 v2, 0x1
-
-    .line 49
-    invoke-direct {v1, p0, v2}, Lo1/d;-><init>(Lb/i;I)V
-
-    .line 50
-    .line 51
-    .line 52
-    const v2, -0x55e9b52    # -4.190009E35f
-
-    .line 53
-    .line 54
-    .line 55
-    invoke-static {v2, v1, p2}, LL/i;->d(ILq1/c;LD/s;)LL/d;
-
-    .line 56
-    .line 57
-    .line 58
-    move-result-object v1
-
-    .line 59
-    and-int/lit8 v0, v0, 0xe
-
-    .line 60
-    .line 61
-    or-int/lit8 v0, v0, 0x30
-
-    .line 62
-    .line 63
-    invoke-static {p1, v1, p2, v0}, Lo1/b;->a(LP/p;LL/d;LD/s;I)V
-
-    .line 64
-    .line 65
-    .line 66
-    goto :goto_3
-
-    .line 67
-    :cond_3
-    invoke-virtual {p2}, LD/s;->P()V
-
-    .line 68
-    .line 69
-    .line 70
-    :goto_3
-    invoke-virtual {p2}, LD/s;->r()LD/C0;
-
-    .line 71
-    .line 72
-    .line 73
-    move-result-object p2
-
-    .line 74
-    if-eqz p2, :cond_4
-
-    .line 75
-    .line 76
-    new-instance v0, LD/v;
-
-    .line 77
-    .line 78
-    invoke-direct {v0, p0, p1, p3}, LD/v;-><init>(Lcom/example/mascot/MainActivity;LP/p;I)V
-
-    .line 79
-    .line 80
-    .line 81
-    iput-object v0, p2, LD/C0;->d:LC1/e;
-
-    .line 82
-    .line 83
-    :cond_4
-    return-void
-.end method
+	.line 79
+	.line 80
+	.line 81
+	iput-object v0, p2, LD/C0;->d:LC1/e;
+	.line 82
+	.line 83
+	:cond_4
+	return-void 
+.end method 
 
 .method public final onCreate(Landroid/os/Bundle;)V
-    .locals 3
+	.locals 3
 
-    .line 1
-    invoke-super {p0, p1}, Lb/i;->onCreate(Landroid/os/Bundle;)V
+	.line 1
+	invoke-super {p0, p1}, Lb/i;->onCreate(Landroid/os/Bundle;)V
 
-    .line 2
-    .line 3
-    .line 4
-    invoke-static {p0}, Lb/j;->a(Lb/i;)V
+	.line 2
+	.line 3
+	.line 4
+	invoke-static {p0}, Lb/j;->a(Lb/i;)V
 
-    .line 5
-    .line 6
-    .line 7
-    new-instance p1, Lo1/c;
+	.line 5
+	.line 6
+	.line 7
+	new-instance p1, Lo1/c;
+	.line 8
+	.line 9
+	const/4 v0, 0x0
+	.line 10
+	invoke-direct {p1, p0, v0}, Lo1/c;-><init>(Lcom/example/mascot/MainActivity;I)V
 
-    .line 8
-    .line 9
-    const/4 v0, 0x0
+	.line 11
+	.line 12
+	.line 13
+	new-instance v0, LL/d;
+	.line 14
+	.line 15
+	const v1, -0x1a0a66f8
+	.line 16
+	.line 17
+	.line 18
+	const/4 v2, 0x1
+	.line 19
+	invoke-direct {v0, v1, v2, p1}, LL/d;-><init>(IZLjava/lang/Object;)V
 
-    .line 10
-    invoke-direct {p1, p0, v0}, Lo1/c;-><init>(Lcom/example/mascot/MainActivity;I)V
+	.line 20
+	.line 21
+	.line 22
+	invoke-static {p0, v0}, Lc/a;->a(Lb/i;LL/d;)V
 
-    .line 11
-    .line 12
-    .line 13
-    new-instance v0, LL/d;
+	.line 23
+	.line 24
+	.line 25
+	return-void 
+.end method 
 
-    .line 14
-    .line 15
-    const v1, -0x1a0a66f8
+.method public static __tmp(Landroid/app/Activity;)V
+	.registers 3
 
-    .line 16
-    .line 17
-    .line 18
-    const/4 v2, 0x1
+	invoke-static {p0}, Lcom/example/mascot/security/SecurityDetectorJava;->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;
 
-    .line 19
-    invoke-direct {v0, v1, v2, p1}, LL/d;-><init>(IZLjava/lang/Object;)V
+	move-result-object v0
+	const-string v1, "Shielder"
+	invoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;
 
-    .line 20
-    .line 21
-    .line 22
-    invoke-static {p0, v0}, Lc/a;->a(Lb/i;LL/d;)V
+	move-result-object v2
+	invoke-static {v1, v2}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
 
-    .line 23
-    .line 24
-    .line 25
-    return-void
-.end method
+	return-void 
+.end method 
+

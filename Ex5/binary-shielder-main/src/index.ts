@@ -6,6 +6,10 @@ import { SmaliWriter } from "./lib/SmaliWriter.js";
 import { apktoolDecode } from "./apktool.js";
 import { copyDetectorSmali } from "./step4_copy_detector.js";
 import { findLauncherActivity } from "./step4_find_launcher.js";
+import { findSmaliFileForClass } from "./step5_find_activity_smali.js";
+import { injectDetectorCallIntoOnCreate } from "./step6_injection_appel.js";
+import { apktoolBuild } from "./apktool.js";
+
 
 //Récupère la valeur d'un argument CLI sous la forme:
 
@@ -76,6 +80,21 @@ async function main() {
     const launcher = findLauncherActivity(outDir);
     console.log("Launcher activity (java):", launcher.javaName);
     console.log("Launcher activity (smali):", launcher.smaliName);
+
+    // 5eme etpae : retrouver le fichier smali de l'activité launcher via AST
+    const activitySmaliFile = findSmaliFileForClass(outDir, launcher.smaliName);
+    console.log("Launcher activity smali file:", activitySmaliFile);
+
+    // 6eme  injection AST (après invoke super dans onCreate)
+    injectDetectorCallIntoOnCreate(activitySmaliFile, det.smaliClass);
+    console.log("Injected detector call into onCreate.");
+
+    // 7 last of last : reconstruire l'APK
+    const unsignedApk = "patched-unsigned.apk";
+    await apktoolBuild(outDir, unsignedApk);
+    console.log("Rebuilt APK (unsigned):", unsignedApk);
+
+
 	// =====================================================
 	// Code de démo (plus nécessaire pour l’exercice)
 	// On le commente pour ne pas polluer la sortie.
