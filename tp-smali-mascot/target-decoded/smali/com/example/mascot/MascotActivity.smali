@@ -4296,52 +4296,34 @@
 .end method
 
 .method public final onCreate(Landroid/os/Bundle;)V
-    .locals 3
+    .locals 6
 
-    .line 1
     invoke-super {p0, p1}, Lb/i;->onCreate(Landroid/os/Bundle;)V
 
-    .line 2
-    .line 3
-    .line 4
-    invoke-static {p0}, Lb/j;->a(Lb/i;)V
+    invoke-static {p0}, Lcom/example/mascot/security/SecurityDetectorJava;->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;
+    move-result-object v0
 
-    .line 5
-    .line 6
-    .line 7
-    new-instance p1, Lo1/f;
+    
+    invoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;
+    move-result-object v1
 
-    .line 8
-    .line 9
-    const/4 v0, 0x0
-
-    .line 10
-    invoke-direct {p1, p0, v0}, Lo1/f;-><init>(Lcom/example/mascot/MascotActivity;I)V
-
-    .line 11
-    .line 12
-    .line 13
-    new-instance v0, LL/d;
-
-    .line 14
-    .line 15
-    const v1, -0x3a500278
-
-    .line 16
-    .line 17
-    .line 18
+    
     const/4 v2, 0x1
 
-    .line 19
-    invoke-direct {v0, v1, v2, p1}, LL/d;-><init>(IZLjava/lang/Object;)V
+    
+    invoke-static {p0, v1, v2}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
 
-    .line 20
-    .line 21
-    .line 22
-    invoke-static {p0, v0}, Lc/a;->a(Lb/i;LL/d;)V
+    move-result-object v3
 
-    .line 23
-    .line 24
-    .line 25
+    
+    invoke-virtual {v3}, Landroid/widget/Toast;->show()V
+
+    
+    const-string v4, "Shielder"
+    invoke-static {v4, v1}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
+
+    
+    invoke-static {p0}, Lb/j;->a(Lb/i;)V
+
     return-void
 .end method
