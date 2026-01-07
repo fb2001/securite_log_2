@@ -145,14 +145,19 @@ adb logcat | grep "Shielder"
 
 ### Exercice 5 — APK modifiée automatiquement (binary-shielder)
 
-Option la plus simple (recommandée) :
+Copier/coller (recommandé) :
 
 ```bash
+export ANDROID_HOME="$HOME/Library/Android/sdk" 2>/dev/null || true
 chmod +x ./run_ex5.sh
 ./run_ex5.sh
 ```
 
-Si tu veux voir toutes les étapes une par une (manuel), voici la version détaillée :
+Si `SDK location not found` apparaît, c’est que l’Android SDK n’est pas installé ou pas détecté. Dans ce cas : installe Android Studio (ou Android SDK) puis définis `ANDROID_HOME` (ou `ANDROID_SDK_ROOT`), puis relance `./run_ex5.sh`.
+
+---
+
+Version détaillée (si besoin) :
 
 ```bash
 # Important (macOS Terminal = zsh) : exécute ce bloc sous bash pour éviter les erreurs de collage (prompt ">")

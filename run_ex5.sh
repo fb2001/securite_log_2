@@ -4,6 +4,26 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
+detect_android_sdk() {
+	# 1) explicit env vars
+	if [[ -n "${ANDROID_HOME:-}" ]] && [[ -d "${ANDROID_HOME:-}" ]]; then
+		echo "$ANDROID_HOME"
+		return 0
+	fi
+	if [[ -n "${ANDROID_SDK_ROOT:-}" ]] && [[ -d "${ANDROID_SDK_ROOT:-}" ]]; then
+		echo "$ANDROID_SDK_ROOT"
+		return 0
+	fi
+
+	# 2) default on macOS
+	if [[ -d "$HOME/Library/Android/sdk" ]]; then
+		echo "$HOME/Library/Android/sdk"
+		return 0
+	fi
+
+	return 1
+}
+
 # Gradle/AGP is not compatible with very new Java versions (e.g. 25.0.1).
 # Force Java 17 on macOS if available.
 if command -v /usr/libexec/java_home >/dev/null 2>&1; then
@@ -26,6 +46,18 @@ adb uninstall com.example.mascot.binary >/dev/null 2>&1 || true
 # 1) Build input APK from mascot/
 (
 	cd mascot
+	# Ensure Android SDK path is known for ZIP users (local.properties is not committed)
+	SDK_DIR="$(detect_android_sdk || true)"
+	if [[ -z "${SDK_DIR:-}" ]]; then
+		echo "ERROR: Android SDK introuvable."
+		echo "Installe Android Studio / Android SDK puis définis ANDROID_HOME ou ANDROID_SDK_ROOT."
+		echo "Exemple macOS: export ANDROID_HOME=\"$HOME/Library/Android/sdk\""
+		exit 1
+	fi
+	if [[ ! -f local.properties ]] || ! grep -q "^sdk.dir=" local.properties; then
+		echo "sdk.dir=$SDK_DIR" > local.properties
+	fi
+
 	./gradlew :app:assembleDebug
 )
 
