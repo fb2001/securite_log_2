@@ -185,3 +185,7 @@ adb install -r Ex5/binary-shielder-main/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat | grep "Shielder"
 ```
+
+## Branche de rendu
+
+Tout le contenu du rendu (Ex4 + Ex5, code + artefacts + explications) est disponible dans la branche `final-version`.

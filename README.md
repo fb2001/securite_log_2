@@ -77,12 +77,14 @@ adb uninstall com.example.mascot.binary || true
 adb logcat -c
 ```
 
+Note : certains appareils/émulateurs refusent l’installation incrémentale (`Incremental installation not allowed`). Dans ce cas, utiliser `--no-incremental`.
+
 ### Exercice 4 — APK modifiée à la main
 
 Installer l’APK signée produite dans `tp-smali-mascot/` :
 
 ```bash
-adb install -r tp-smali-mascot/patched-signed.apk
+adb install -r --no-incremental tp-smali-mascot/patched-signed.apk
 ```
 
 
@@ -104,7 +106,11 @@ Installer l’APK signée produite par l’outil dans `Ex5/binary-shielder-main/
 
 ```bash
 adb uninstall com.example.mascot.binary || true
-adb install -r Ex5/binary-shielder-main/patched-signed.apk
+adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat | grep "Shielder"
 ```
+
+## Branche de rendu
+
+Tout le travail demandé (Ex4 + Ex5, code + docs) est présent dans la branche `final-version`.
