@@ -179,11 +179,12 @@ ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -
 "$APKSIGNER" version
 
 # Android 11+ : l’APK doit être alignée (resources.arsc non compressé et aligné)
+ROOT="$PWD"
 TMPDIR="$(mktemp -d)"
 unzip -p tp-smali-mascot/patched-unsigned.apk resources.arsc > "$TMPDIR/resources.arsc"
 cp tp-smali-mascot/patched-unsigned.apk tp-smali-mascot/patched-unsigned-nocompress.apk
 zip -q -d tp-smali-mascot/patched-unsigned-nocompress.apk resources.arsc
-( cd "$TMPDIR" && zip -q -0 "$PWD/tp-smali-mascot/patched-unsigned-nocompress.apk" resources.arsc )
+( cd "$TMPDIR" && zip -q -0 "$ROOT/tp-smali-mascot/patched-unsigned-nocompress.apk" resources.arsc )
 rm -rf "$TMPDIR"
 
 "$ZIPALIGN" -p 4 tp-smali-mascot/patched-unsigned-nocompress.apk tp-smali-mascot/patched-unsigned-aligned.apk
@@ -218,11 +219,12 @@ APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort
 ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
 "$APKSIGNER" version
 
+ROOT="$PWD"
 TMPDIR="$(mktemp -d)"
 unzip -p Ex5/binary-shielder-main/patched-unsigned.apk resources.arsc > "$TMPDIR/resources.arsc"
 cp Ex5/binary-shielder-main/patched-unsigned.apk Ex5/binary-shielder-main/patched-unsigned-nocompress.apk
 zip -q -d Ex5/binary-shielder-main/patched-unsigned-nocompress.apk resources.arsc
-( cd "$TMPDIR" && zip -q -0 "$PWD/Ex5/binary-shielder-main/patched-unsigned-nocompress.apk" resources.arsc )
+( cd "$TMPDIR" && zip -q -0 "$ROOT/Ex5/binary-shielder-main/patched-unsigned-nocompress.apk" resources.arsc )
 rm -rf "$TMPDIR"
 
 "$ZIPALIGN" -p 4 Ex5/binary-shielder-main/patched-unsigned-nocompress.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
