@@ -18,6 +18,20 @@ function findOnCreateBlock(lines: string[]): { start: number; end: number } {
 	return { start, end: start + 1 + relEnd };
 }
 
+function findVerifierSecuriteBlock(lines: string[]): { start: number; end: number } {
+	const start = lines.findIndex(
+		(l) => l.includes(".method") && l.includes(" verifierSecurite()Z")
+	);
+	if (start < 0) throw new Error("verifierSecurite()Z introuvable dans MainActivity.");
+
+	const relEnd = lines
+		.slice(start + 1)
+		.findIndex((l) => l.trim() === ".end method");
+	if (relEnd < 0) throw new Error("Bloc verifierSecurite incomplet (.end method introuvable).\n");
+
+	return { start, end: start + 1 + relEnd };
+}
+
 function bumpLocalsOrRegisters(lines: string[], start: number, end: number, min: number) {
 	for (let i = start; i <= end; i++) {
 		const trimmed = lines[i].trim();
@@ -46,37 +60,48 @@ export function injectDetectorCallIntoOnCreate(
 	detectorClass: string
 ) {
 	const original = fs.readFileSync(mainActivitySmaliFile, "utf8");
-	if (original.includes(`${detectorClass}->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;`)) {
-		return; // déjà injecté
+	if (original.includes("Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I")) {
+		return; // déjà injecté (évite double-injection)
 	}
 
 	const eol = detectEol(original);
 	const lines = original.split(/\r?\n/);
-	const { start, end } = findOnCreateBlock(lines);
+	// Le binaire "mascot" appelle déjà getSecurityDiagnostics(...) dans verifierSecurite().
+	// Ici on ajoute simplement un Log.d("Shielder", diagnostic.toString()) juste après.
+	const { start, end } = findVerifierSecuriteBlock(lines);
 
-	const invokeIdx = (() => {
+	const callIdx = (() => {
 		for (let i = start; i <= end; i++) {
 			const t = lines[i] ?? "";
-			if (t.includes("invoke-super") && t.includes("->onCreate(")) return i;
+			if (t.includes("invoke-static") && t.includes(`${detectorClass}->getSecurityDiagnostics(`)) return i;
 		}
 		return -1;
 	})();
-	if (invokeIdx < 0) {
-		throw new Error("invoke-super->onCreate(...) introuvable : point d’insertion non trouvé.");
+	if (callIdx < 0) {
+		throw new Error("Appel à getSecurityDiagnostics(...) introuvable dans verifierSecurite(): point d’insertion non trouvé.");
+	}
+
+	const moveIdx = (() => {
+		for (let i = callIdx + 1; i <= Math.min(callIdx + 6, end); i++) {
+			const t = (lines[i] ?? "").trim();
+			if (t.startsWith("move-result-object") && t.includes("v0")) return i;
+		}
+		return -1;
+	})();
+	if (moveIdx < 0) {
+		throw new Error("move-result-object v0 introuvable après getSecurityDiagnostics(...).");
 	}
 
 	bumpLocalsOrRegisters(lines, start, end, 3);
 
 	const injection = [
-		`\tinvoke-static {p0}, ${detectorClass}->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;`,
-		"\tmove-result-object v0",
 		"\tconst-string v1, \"Shielder\"",
 		"\tinvoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;",
 		"\tmove-result-object v2",
 		"\tinvoke-static {v1, v2}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I",
 	];
 
-	lines.splice(invokeIdx + 1, 0, ...injection);
+	lines.splice(moveIdx + 1, 0, ...injection);
 
 	fs.writeFileSync(mainActivitySmaliFile, lines.join(eol), "utf8");
 }

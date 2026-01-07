@@ -145,7 +145,14 @@ adb logcat | grep "Shielder"
 
 ### Exercice 5 — APK modifiée automatiquement (binary-shielder)
 
-Générer l’APK patchée, la signer, puis l’installer :
+Option la plus simple (recommandée) :
+
+```bash
+chmod +x ./run_ex5.sh
+./run_ex5.sh
+```
+
+Si tu veux voir toutes les étapes une par une (manuel), voici la version détaillée :
 
 ```bash
 # Important (macOS Terminal = zsh) : exécute ce bloc sous bash pour éviter les erreurs de collage (prompt ">")
@@ -179,7 +186,7 @@ if [ ! -f "Ex5/binary-shielder-main/patched-unsigned.apk" ]; then
 fi
 
 # sanity check: avoid signing an invalid/empty zip
-if ! unzip -l Ex5/binary-shielder-main/patched-unsigned.apk | grep -q "AndroidManifest.xml"; then
+if ! unzip -l Ex5/binary-shielder-main/patched-unsigned.apk | grep "AndroidManifest.xml" >/dev/null; then
 	echo "ERROR: APK invalide: AndroidManifest.xml manquant dans patched-unsigned.apk (arrêt)."
 	exit 1
 fi
@@ -208,9 +215,10 @@ rm -rf "$TMPDIR"
 	--out Ex5/binary-shielder-main/patched-signed.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
 
 adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
-adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat -c
-adb logcat | grep "Shielder"
+adb shell am start -n com.example.mascot.binary/com.example.mascot.MainActivity >/dev/null || true
+sleep 3
+adb logcat -d | grep "Shielder" || true
 BASH
 ```
 

@@ -9,7 +9,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mascot"
+        applicationId = "com.example.mascot.binary"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
