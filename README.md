@@ -40,7 +40,7 @@ Le passage du code source au binaire n'a pas été sans friction. Voici les prin
 ### Pré-requis
 *   Avoir `apktool` installé dans le PATH.
 *   Node.js pour l'outil automatique.
-*   (Exercice 5) Générer le parser ANTLR : `npm run generate-parser`.
+*   (Exercice 5) Script `npm run generate-parser` : no-op (parser déjà généré et présent dans le dépôt), mais tu peux le lancer sans risque.
 
 ### Lancer l'outil automatique
 ```bash
@@ -54,6 +54,8 @@ npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.sm
 ```
 
 Le fichier détecteur `.smali` peut être récupéré depuis une décompilation Apktool (par ex. dans `tp-smali-mascot/mascot-decoded/.../SecurityDetectorJava.smali`).
+
+Note : pour simplifier l’exécution depuis un dépôt téléchargé en `.zip`, une copie du détecteur est déjà fournie ici : `Ex5/binary-shielder-main/SecurityDetectorJava.smali`.
 
 L'outil produit un APK reconstruit non signé (`patched-unsigned.apk`).
 Il faut ensuite le signer (via `apksigner` ou `uber-apk-signer`) avant installation. La procédure exacte que nous avons utilisée (keystore + `keytool`/`jarsigner`, au lieu du script fourni) est détaillée dans [EQUIVALENCE_TP_PART2.md](EQUIVALENCE_TP_PART2.md).
@@ -123,11 +125,6 @@ Lancer l’app (ou l’ouvrir manuellement depuis l’émulateur) , mais avant c
 
 ```bash
 adb logcat | grep "Shielder"
-```
-sur un autre terminal : 
-
-```bash
-adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 ```
 
 ### Exercice 5 — APK modifiée automatiquement (binary-shielder)
