@@ -17,10 +17,10 @@ function getArg(name) {
 }
 function usageAndExit() {
     console.error(`Usage:
-  npm run start -- --apk <file.apk>
+    npm run start -- --apk <file.apk> --detector <file.smali>
 
 Example:
-  npm run start -- --apk mascot-original.apk
+    npm run start -- --apk mascot-original.apk --detector ./SecurityDetectorJava.smali
 `);
     process.exit(1);
 }
