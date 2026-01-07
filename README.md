@@ -79,11 +79,32 @@ adb logcat -c
 
 Note : certains appareils/émulateurs refusent l’installation incrémentale (`Incremental installation not allowed`). Dans ce cas, utiliser `--no-incremental`.
 
+Important : les APK générées/signées ne sont pas versionnées dans GitHub (elles sont des artefacts de build). Si tu télécharges le dépôt en `.zip`, tu dois reconstruire et signer avant installation.
+
+Signature (macOS) : `apksigner` et `zipalign` ne sont pas toujours dans le PATH. Ils sont généralement ici : `~/Library/Android/sdk/build-tools/<version>/apksigner` et `~/Library/Android/sdk/build-tools/<version>/zipalign`.
+Si `apksigner` est introuvable, installe les *Android SDK Build-Tools* (via Android Studio / SDK Manager).
+
 ### Exercice 4 — APK modifiée à la main
 
-Installer l’APK signée produite dans `tp-smali-mascot/` :
+Reconstruire puis signer, puis installer :
 
 ```bash
+# rebuild
+apktool b tp-smali-mascot/target-decoded -o tp-smali-mascot/patched-unsigned.apk
+
+# zipalign + sign (Android SDK Build-Tools)
+
+# locate build-tools
+APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
+ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
+"$APKSIGNER" version
+
+"$ZIPALIGN" -p 4 tp-smali-mascot/patched-unsigned.apk tp-smali-mascot/patched-unsigned-aligned.apk
+
+"$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey \
+	--ks-pass pass:android --key-pass pass:android \
+	--out tp-smali-mascot/patched-signed.apk tp-smali-mascot/patched-unsigned-aligned.apk
+
 adb install -r --no-incremental tp-smali-mascot/patched-signed.apk
 ```
 
@@ -102,10 +123,29 @@ adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHE
 
 ### Exercice 5 — APK modifiée automatiquement (binary-shielder)
 
-Installer l’APK signée produite par l’outil dans `Ex5/binary-shielder-main/` :
+Générer l’APK patchée, la signer, puis l’installer :
 
 ```bash
 adb uninstall com.example.mascot.binary || true
+
+# build (outil TS) -> produit Ex5/binary-shielder-main/patched-unsigned.apk
+cd Ex5/binary-shielder-main
+npm install
+npm run generate-parser
+npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.smali
+cd ../..
+
+# sign
+APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
+ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
+"$APKSIGNER" version
+
+"$ZIPALIGN" -p 4 Ex5/binary-shielder-main/patched-unsigned.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
+
+"$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey \
+	--ks-pass pass:android --key-pass pass:android \
+	--out Ex5/binary-shielder-main/patched-signed.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
+
 adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat | grep "Shielder"

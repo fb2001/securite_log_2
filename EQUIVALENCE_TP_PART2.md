@@ -168,7 +168,24 @@ Pour démontrer que l’injection manuelle fonctionne réellement, on installe l
 adb devices
 adb uninstall com.example.mascot.binary || true
 adb logcat -c
-adb install -r tp-smali-mascot/patched-signed.apk
+
+# Les APK signées ne sont pas versionnées dans GitHub (artefacts de build).
+# Rebuild + signature avant installation :
+apktool b tp-smali-mascot/target-decoded -o tp-smali-mascot/patched-unsigned.apk
+
+# apksigner (Android SDK Build-Tools) : souvent ici sur macOS
+APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
+ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
+"$APKSIGNER" version
+
+# Android 11+ : l’APK doit être alignée (resources.arsc non compressé et aligné)
+"$ZIPALIGN" -p 4 tp-smali-mascot/patched-unsigned.apk tp-smali-mascot/patched-unsigned-aligned.apk
+
+"$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey \
+	--ks-pass pass:android --key-pass pass:android \
+	--out tp-smali-mascot/patched-signed.apk tp-smali-mascot/patched-unsigned-aligned.apk
+
+adb install -r --no-incremental tp-smali-mascot/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat | grep "Shielder"
 ```
@@ -181,7 +198,26 @@ Pour l’automatisation (binary-shielder), le test consiste à installer l’APK
 adb devices
 adb uninstall com.example.mascot.binary || true
 adb logcat -c
-adb install -r Ex5/binary-shielder-main/patched-signed.apk
+
+# Build (outil) -> patched-unsigned.apk
+cd Ex5/binary-shielder-main
+npm install
+npm run generate-parser
+npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.smali
+cd ../..
+
+# Signature -> patched-signed.apk
+APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
+ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
+"$APKSIGNER" version
+
+"$ZIPALIGN" -p 4 Ex5/binary-shielder-main/patched-unsigned.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
+
+"$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey \
+	--ks-pass pass:android --key-pass pass:android \
+	--out Ex5/binary-shielder-main/patched-signed.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
+
+adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat | grep "Shielder"
 ```
