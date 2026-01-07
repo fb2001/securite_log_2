@@ -214,11 +214,17 @@ adb uninstall com.example.mascot.binary || true
 adb logcat -c
 
 # Build (outil) -> patched-unsigned.apk
-cd Ex5/binary-shielder-main
-npm install
-npm run generate-parser
-npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.smali
-cd ../..
+# IMPORTANT: l’APK d’entrée (fournie par l’énoncé) doit être placée à la racine du dépôt.
+APK_IN="$PWD/app-binary.apk"
+if [ ! -f "$APK_IN" ]; then
+	echo "ERROR: APK d’entrée introuvable: $APK_IN"
+	echo "Place ton APK cible à la racine (app-binary.apk) ou modifie APK_IN."
+	exit 1
+fi
+
+npm --prefix Ex5/binary-shielder-main install
+npm --prefix Ex5/binary-shielder-main run generate-parser
+npm --prefix Ex5/binary-shielder-main run start -- --apk "$APK_IN" --detector "$PWD/Ex5/binary-shielder-main/SecurityDetectorJava.smali"
 
 # Signature -> patched-signed.apk
 APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
