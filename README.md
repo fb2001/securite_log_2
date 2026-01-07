@@ -135,11 +135,23 @@ Générer l’APK patchée, la signer, puis l’installer :
 adb uninstall com.example.mascot.binary || true
 
 # build (outil TS) -> produit Ex5/binary-shielder-main/patched-unsigned.apk
-cd Ex5/binary-shielder-main
-npm install
-npm run generate-parser
-npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.smali
-cd ../..
+# IMPORTANT: l’APK d’entrée n’est pas versionnée dans le dépôt (artefact fourni par l’énoncé).
+# -> place ton APK cible à la racine sous le nom app-binary.apk, OU change la variable APK_IN.
+APK_IN="$PWD/app-binary.apk"
+if [ ! -f "$APK_IN" ]; then
+	echo "ERROR: APK d’entrée introuvable: $APK_IN"
+	echo "Place ton APK cible à la racine (app-binary.apk) ou modifie APK_IN."
+	exit 1
+fi
+
+npm --prefix Ex5/binary-shielder-main install
+npm --prefix Ex5/binary-shielder-main run generate-parser
+npm --prefix Ex5/binary-shielder-main run start -- --apk "$APK_IN" --detector "$PWD/Ex5/binary-shielder-main/SecurityDetectorJava.smali"
+
+if [ ! -f "Ex5/binary-shielder-main/patched-unsigned.apk" ]; then
+	echo "ERROR: Ex5/binary-shielder-main/patched-unsigned.apk n’a pas été généré (arrêt)."
+	exit 1
+fi
 
 # sign
 APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"

@@ -14,7 +14,7 @@ Le détecteur a été implémenté en Java dans le projet Android `mascot`, puis
 
 Le code source du détecteur est ici : [mascot/app/src/main/java/com/example/mascot/security/SecurityDetectorJava.java](mascot/app/src/main/java/com/example/mascot/security/SecurityDetectorJava.java)
 
-Une APK compilée utilisée comme base est présente à la racine : [app-binary.apk](app-binary.apk)
+L’APK d’entrée utilisée pour les tests s’appelle `app-binary.apk`. Elle n’est pas versionnée dans Git (artefact fourni par l’énoncé) : il faut la placer à la racine du dépôt avant d’exécuter les commandes.
 
 La décompilation Apktool qui contient le Smali du détecteur est dans : [tp-smali-mascot/mascot-decoded/](tp-smali-mascot/mascot-decoded/)
 
@@ -101,6 +101,12 @@ Commandes :
 cd Ex5/binary-shielder-main
 npm install
 npm run generate-parser
+APK_IN="$PWD/../../app-binary.apk"
+if [ ! -f "$APK_IN" ]; then
+	echo "ERROR: APK d’entrée introuvable: $APK_IN"
+	echo "Place ton APK cible à la racine (app-binary.apk) ou modifie APK_IN."
+	exit 1
+fi
 ```
 
 ### Étape 2 — Paramétrage argument APK en entrée
@@ -153,7 +159,7 @@ Commande de lancement complète (exemple) :
 cd Ex5/binary-shielder-main
 npm install
 npm run generate-parser
-npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.smali
+npm run start -- --apk "$APK_IN" --detector ./SecurityDetectorJava.smali
 ```
 
 Après reconstruction, l’APK doit être signée avant installation sur un appareil/émulateur, conformément à l’énoncé.
