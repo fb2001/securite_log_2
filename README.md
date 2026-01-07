@@ -148,6 +148,8 @@ adb logcat | grep "Shielder"
 Générer l’APK patchée, la signer, puis l’installer :
 
 ```bash
+set -euo pipefail
+
 adb uninstall com.example.mascot.binary || true
 
 # build (outil TS) -> produit Ex5/binary-shielder-main/patched-unsigned.apk
@@ -174,9 +176,19 @@ if [ ! -f "Ex5/binary-shielder-main/patched-unsigned.apk" ]; then
 	exit 1
 fi
 
+# sanity check: avoid signing an invalid/empty zip
+if ! unzip -l Ex5/binary-shielder-main/patched-unsigned.apk | grep -q "AndroidManifest.xml"; then
+	echo "ERROR: APK invalide: AndroidManifest.xml manquant dans patched-unsigned.apk (arrêt)."
+	exit 1
+fi
+
 # sign
 APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
 ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
+if [ -z "$APKSIGNER" ] || [ -z "$ZIPALIGN" ]; then
+	echo "ERROR: build-tools introuvables (apksigner/zipalign). Vérifie Android SDK Build-Tools."
+	exit 1
+fi
 "$APKSIGNER" version
 
 ROOT="$PWD"
@@ -195,6 +207,7 @@ rm -rf "$TMPDIR"
 
 adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
+adb logcat -c
 adb logcat | grep "Shielder"
 ```
 

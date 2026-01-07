@@ -1,102 +1,43 @@
 import * as fs from "fs";
-import { CharStream, CommonTokenStream } from "antlr4ng";
-import { SmaliLexer } from "./lib/SmaliLexer.js";
-import { SmaliParser, ParseContext } from "./lib/SmaliParser.js";
-import { SmaliWriter } from "./lib/SmaliWriter.js";
 
-//Parse un fichier smali (AST complet)
-function parseSmaliFile(file: string): ParseContext {
-	const text = fs.readFileSync(file, "utf8");
-	const lexer = new SmaliLexer(CharStream.fromString(text));
-	const tokens = new CommonTokenStream(lexer);
-	const parser = new SmaliParser(tokens);
-	parser.removeErrorListeners();
-	return parser.parse();
+function detectEol(text: string): "\n" | "\r\n" {
+	return text.includes("\r\n") ? "\r\n" : "\n";
 }
 
-//Parse un snippet smali en créant un petit AST temporaire
-function parseSnippetToAst(snippet: string): ParseContext {
-	const lexer = new SmaliLexer(CharStream.fromString(snippet));
-	const tokens = new CommonTokenStream(lexer);
-	const parser = new SmaliParser(tokens);
-	parser.removeErrorListeners();
-	return parser.parse();
+function findOnCreateBlock(lines: string[]): { start: number; end: number } {
+	const start = lines.findIndex(
+		(l) => l.includes(".method") && l.includes(" onCreate(")
+	);
+	if (start < 0) throw new Error("onCreate(...) introuvable dans MainActivity.");
+
+	const relEnd = lines
+		.slice(start + 1)
+		.findIndex((l) => l.trim() === ".end method");
+	if (relEnd < 0) throw new Error("Bloc onCreate incomplet (.end method introuvable).\n");
+
+	return { start, end: start + 1 + relEnd };
 }
 
-function* walk(node: any): Generator<any> {
-	yield node;
-	const children = node?.children;
-	if (Array.isArray(children)) {
-		for (const c of children) yield* walk(c);
-	}
-}
-
-
-function findMethodNodeByName(tree: ParseContext, name: string): any | null {
-	for (const n of walk(tree)) {
-		if (typeof n?.getText !== "function") continue;
-		const t = n.getText();
-		if (t.includes(".method") && t.includes(name + "(")) return n;
-	}
-	return null;
-}
-
-
-function findInvokeSuperIndex(methodNode: any): number {
-	const children: any[] = methodNode?.children ?? [];
-	for (let i = 0; i < children.length; i++) {
-		const t = typeof children[i]?.getText === "function" ? children[i].getText() : "";
-		if (t.includes("invoke-super") && t.includes("->onCreate(")) return i;
-	}
-	return -1;
-}
-
-
-function buildInjectionNodes(detectorClass: string): any[] {
-	const snippet = `
-    .class public L__Tmp;
-    .super Ljava/lang/Object;
-
-    .method public static __tmp(Landroid/app/Activity;)V
-        .registers 3
-
-        invoke-static {p0}, ${detectorClass}->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;
-        move-result-object v0
-
-        const-string v1, "Shielder"
-        invoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;
-        move-result-object v2
-        invoke-static {v1, v2}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I
-
-        return-void
-    .end method
-    `;
-
-
-
-	const tmpTree = parseSnippetToAst(snippet);
-	const tmpMethod = findMethodNodeByName(tmpTree, "__tmp") ?? (() => {
-		// fallback : trouver le premier ".method"
-		for (const n of walk(tmpTree)) {
-			const t = typeof n?.getText === "function" ? n.getText() : "";
-			if (t.includes(".method")) return n;
+function bumpLocalsOrRegisters(lines: string[], start: number, end: number, min: number) {
+	for (let i = start; i <= end; i++) {
+		const trimmed = lines[i].trim();
+		const mLocals = trimmed.match(/^\.locals\s+(\d+)\s*$/);
+		if (mLocals) {
+			const current = Number.parseInt(mLocals[1] ?? "0", 10);
+			if (Number.isFinite(current) && current < min) {
+				lines[i] = lines[i].replace(/\.locals\s+\d+/, `.locals ${min}`);
+			}
+			return;
 		}
-		return null;
-	})();
-
-	if (!tmpMethod) throw new Error("Impossible de parser le snippet d’injection (méthode tmp introuvable).");
-
-	// On récupère les nodes "instruction" (invoke- / const- / move- / return-)
-	const nodes: any[] = [];
-	for (const c of tmpMethod.children ?? []) {
-		const t = typeof c?.getText === "function" ? c.getText() : "";
-		if (t.includes("invoke-") || t.includes("move-") || t.includes("const-")) {
-			nodes.push(c);
+		const mRegs = trimmed.match(/^\.registers\s+(\d+)\s*$/);
+		if (mRegs) {
+			const current = Number.parseInt(mRegs[1] ?? "0", 10);
+			if (Number.isFinite(current) && current < min) {
+				lines[i] = lines[i].replace(/\.registers\s+\d+/, `.registers ${min}`);
+			}
+			return;
 		}
 	}
-
-	if (nodes.length === 0) throw new Error("Snippet parsed, mais aucune instruction extraite.");
-	return nodes;
 }
 
 
@@ -104,24 +45,38 @@ export function injectDetectorCallIntoOnCreate(
 	mainActivitySmaliFile: string,
 	detectorClass: string
 ) {
-    const original = fs.readFileSync(mainActivitySmaliFile, "utf8");
-    if (original.includes("android/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I")) {
-    	return; // déjà injecté pour eviter de le faire a plusiur fois
-    }
+	const original = fs.readFileSync(mainActivitySmaliFile, "utf8");
+	if (original.includes(`${detectorClass}->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;`)) {
+		return; // déjà injecté
+	}
 
-	const tree = parseSmaliFile(mainActivitySmaliFile);
+	const eol = detectEol(original);
+	const lines = original.split(/\r?\n/);
+	const { start, end } = findOnCreateBlock(lines);
 
-    const onCreate = findMethodNodeByName(tree, "onCreate");
-	if (!onCreate) throw new Error("onCreate(...) introuvable dans MainActivity.");
+	const invokeIdx = (() => {
+		for (let i = start; i <= end; i++) {
+			const t = lines[i] ?? "";
+			if (t.includes("invoke-super") && t.includes("->onCreate(")) return i;
+		}
+		return -1;
+	})();
+	if (invokeIdx < 0) {
+		throw new Error("invoke-super->onCreate(...) introuvable : point d’insertion non trouvé.");
+	}
 
-	const idx = findInvokeSuperIndex(onCreate);
-	if (idx < 0) throw new Error("invoke-super->onCreate(...) introuvable : point d’insertion non trouvé.");
+	bumpLocalsOrRegisters(lines, start, end, 3);
 
-	const injectionNodes = buildInjectionNodes(detectorClass);
+	const injection = [
+		`\tinvoke-static {p0}, ${detectorClass}->getSecurityDiagnostics(Landroid/content/Context;)Ljava/util/Map;`,
+		"\tmove-result-object v0",
+		"\tconst-string v1, \"Shielder\"",
+		"\tinvoke-interface {v0}, Ljava/util/Map;->toString()Ljava/lang/String;",
+		"\tmove-result-object v2",
+		"\tinvoke-static {v1, v2}, Landroid/util/Log;->d(Ljava/lang/String;Ljava/lang/String;)I",
+	];
 
-	onCreate.children.splice(idx + 1, 0, ...injectionNodes);
-	for (const n of injectionNodes) n.parent = onCreate;
+	lines.splice(invokeIdx + 1, 0, ...injection);
 
-	// Réécriture du fichier modifié
-	SmaliWriter.write(tree, mainActivitySmaliFile);
+	fs.writeFileSync(mainActivitySmaliFile, lines.join(eol), "utf8");
 }
