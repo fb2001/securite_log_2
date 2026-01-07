@@ -43,14 +43,30 @@ Le passage du code source au binaire n'a pas été sans friction. Voici les prin
 *   (Exercice 5) Script `npm run generate-parser` : no-op (parser déjà généré et présent dans le dépôt), mais tu peux le lancer sans risque.
 
 ### Lancer l'outil automatique
+Objectif : lancer Ex5 en utilisant uniquement le contenu du dépôt. Pour ça, on génère d’abord une APK d’entrée à partir du projet Android `mascot/` (inclus), puis on la passe à l’outil.
+
+Commande recommandée (depuis la racine du dépôt) :
+
 ```bash
-cd Ex5/binary-shielder-main
-npm install
-npm run generate-parser
+# 1) Générer une APK d'entrée (debug) depuis le projet mascot
+cd mascot
+./gradlew :app:assembleDebug
+cd ..
+
+APK_IN="$PWD/mascot/app/build/outputs/apk/debug/app-debug.apk"
+if [ ! -f "$APK_IN" ]; then
+	echo "ERROR: APK d’entrée introuvable: $APK_IN"
+	echo "Vérifie que la build Gradle a réussi (Android SDK requis)."
+	exit 1
+fi
+
+# 2) Lancer l’outil Ex5 (binary-shielder)
+npm --prefix Ex5/binary-shielder-main install
+npm --prefix Ex5/binary-shielder-main run generate-parser
 
 # --apk : APK cible à protéger
-# --detector : fichier .smali du détecteur (ex: SecurityDetectorJava.smali)
-npm run start -- --apk ../../app-binary.apk --detector ./SecurityDetectorJava.smali
+# --detector : fichier .smali du détecteur
+npm --prefix Ex5/binary-shielder-main run start -- --apk "$APK_IN" --detector "$PWD/Ex5/binary-shielder-main/SecurityDetectorJava.smali"
 ```
 
 Le fichier détecteur `.smali` peut être récupéré depuis une décompilation Apktool (par ex. dans `tp-smali-mascot/mascot-decoded/.../SecurityDetectorJava.smali`).
@@ -135,15 +151,20 @@ Générer l’APK patchée, la signer, puis l’installer :
 adb uninstall com.example.mascot.binary || true
 
 # build (outil TS) -> produit Ex5/binary-shielder-main/patched-unsigned.apk
-# IMPORTANT: l’APK d’entrée n’est pas versionnée dans le dépôt (artefact fourni par l’énoncé).
-# -> place ton APK cible à la racine sous le nom app-binary.apk, OU change la variable APK_IN.
-APK_IN="$PWD/app-binary.apk"
+
+# 1) Générer une APK d’entrée (debug) depuis le projet mascot inclus
+cd mascot
+./gradlew :app:assembleDebug
+cd ..
+
+APK_IN="$PWD/mascot/app/build/outputs/apk/debug/app-debug.apk"
 if [ ! -f "$APK_IN" ]; then
 	echo "ERROR: APK d’entrée introuvable: $APK_IN"
-	echo "Place ton APK cible à la racine (app-binary.apk) ou modifie APK_IN."
+	echo "Vérifie que la build Gradle a réussi (Android SDK requis)."
 	exit 1
 fi
 
+# 2) Lancer Ex5
 npm --prefix Ex5/binary-shielder-main install
 npm --prefix Ex5/binary-shielder-main run generate-parser
 npm --prefix Ex5/binary-shielder-main run start -- --apk "$APK_IN" --detector "$PWD/Ex5/binary-shielder-main/SecurityDetectorJava.smali"
