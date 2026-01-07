@@ -1,5 +1,11 @@
 # Équivalence au sujet — TP Partie 2 (Vérification environnementale)
 
+## Binôme
+
+**BENOMAR Fadel | N° étudiant : 22015967 M2 Génie Logiciel**
+
+**GRARI Youssef | N° étudiant : 22015973 M2 Génie Logiciel**
+
 Ce document montre que l’implémentation présente dans ce dépôt correspond aux étapes demandées dans l’énoncé (Exercice 4 et Exercice 5). Il sert de « guide de correction » : où regarder, quoi lancer, et quels artefacts prouvent que les étapes ont été faites.
 
 ## Objectif du TP (Partie 2)

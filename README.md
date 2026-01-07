@@ -1,5 +1,11 @@
 # Compte Rendu TP : Sécurité Android & Injection Binaire
 
+## Binôme
+
+**BENOMAR Fadel | N° étudiant : 22015967 M2 Génie Logiciel**
+
+**GRARI Youssef | N° étudiant : 22015973 M2 Génie Logiciel**
+
 Ce dépôt contient notre travail sur la partie 2 du TP de cybersécurité. L'objectif était de protéger une application Android (dont on ne possède pas les sources) en injectant dynamiquement des détecteurs de sécurité (Root, Émulateur, Debug) directement au niveau du code binaire.
 
 ## Ce qu'on a implémenté :
