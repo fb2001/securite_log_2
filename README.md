@@ -21,10 +21,12 @@ La première étape a été de comprendre comment injecter du code "à la main" 
 
 L'exercice 5 visait à automatiser ce processus laborieux via un outil en **TypeScript** nommé `binary-shielder`.
 
-Plutôt que de faire des recherches/remplacements de texte basiques, l'outil utilise **ANTLR** pour parser le code Smali et générer un **AST (Abstract Syntax Tree)**. Cela permet de manipuler le code de manière beaucoup plus propre :
-1.  On localise le noeud correspondant à la méthode `onCreate`.
-2.  On cherche l'appel au constructeur parent (`invoke-super`).
-3.  On injecte l'instruction d'appel à notre détecteur juste après, garantissant que l'application est "protégée" avant même d'afficher son premier écran.
+L’outil automatise :
+1. La décompilation via `apktool`.
+2. La copie du détecteur (`SecurityDetectorJava.smali`) dans le bon dossier Smali.
+3. La recherche de l’activité de démarrage via le `AndroidManifest.xml`.
+4. L’injection d’un `Log.d("Shielder", ...)` juste après l’appel à `getSecurityDiagnostics(...)` (preuve que le détecteur est bien exécuté).
+5. La reconstruction en APK non signée (`patched-unsigned.apk`).
 
 ##  Difficultés rencontrées
 
@@ -45,7 +47,20 @@ Le passage du code source au binaire n'a pas été sans friction. Voici les prin
 ### Lancer l'outil automatique
 Objectif : lancer Ex5 en utilisant uniquement le contenu du dépôt. Pour ça, on génère d’abord une APK d’entrée à partir du projet Android `mascot/` (inclus), puis on la passe à l’outil.
 
-Commande recommandée (depuis la racine du dépôt) :
+Commande recommandée (depuis la racine du dépôt, compatible ZIP) :
+
+```bash
+chmod +x ./run_ex5.sh
+./run_ex5.sh
+```
+
+Notes :
+* Si `SDK location not found` apparaît, c’est que l’Android SDK n’est pas installé ou pas détecté. Dans ce cas : installe Android Studio (ou Android SDK) puis définis `ANDROID_HOME` (ou `ANDROID_SDK_ROOT`), puis relance `./run_ex5.sh`.
+* `npm run generate-parser` est un no-op (parser déjà présent dans le dépôt).
+
+---
+
+Commandes détaillées (si besoin) :
 
 ```bash
 # 1) Générer une APK d'entrée (debug) depuis le projet mascot
@@ -81,7 +96,7 @@ Pour vérifier que l'injection a réussi, on regarde les logs de l'appareil pend
 ```bash
 adb logcat | grep "Shielder"
 ```
-Si des logs avec le tag `Shielder` apparaissent (et contiennent la Map renvoyée par `getSecurityDiagnostics(...)`), alors l'appel injecté dans `onCreate` a bien été exécuté.
+Si des logs avec le tag `Shielder` apparaissent (et contiennent la Map renvoyée par `getSecurityDiagnostics(...)`), alors l’appel injecté a bien été exécuté.
 
 ##  Tests sur émulateur (preuves Ex4 / Ex5)
 
@@ -156,76 +171,6 @@ chmod +x ./run_ex5.sh
 Si `SDK location not found` apparaît, c’est que l’Android SDK n’est pas installé ou pas détecté. Dans ce cas : installe Android Studio (ou Android SDK) puis définis `ANDROID_HOME` (ou `ANDROID_SDK_ROOT`), puis relance `./run_ex5.sh`.
 
 ---
-
-Version détaillée (si besoin) :
-
-```bash
-# Important (macOS Terminal = zsh) : exécute ce bloc sous bash pour éviter les erreurs de collage (prompt ">")
-bash <<'BASH'
-set -euo pipefail
-
-adb uninstall com.example.mascot.binary || true
-
-# build (outil TS) -> produit Ex5/binary-shielder-main/patched-unsigned.apk
-
-# 1) Générer une APK d’entrée (debug) depuis le projet mascot inclus
-cd mascot
-./gradlew :app:assembleDebug
-cd ..
-
-APK_IN="$PWD/mascot/app/build/outputs/apk/debug/app-debug.apk"
-if [ ! -f "$APK_IN" ]; then
-	echo "ERROR: APK d’entrée introuvable: $APK_IN"
-	echo "Vérifie que la build Gradle a réussi (Android SDK requis)."
-	exit 1
-fi
-
-# 2) Lancer Ex5
-npm --prefix Ex5/binary-shielder-main install
-npm --prefix Ex5/binary-shielder-main run generate-parser
-npm --prefix Ex5/binary-shielder-main run start -- --apk "$APK_IN" --detector "$PWD/Ex5/binary-shielder-main/SecurityDetectorJava.smali"
-
-if [ ! -f "Ex5/binary-shielder-main/patched-unsigned.apk" ]; then
-	echo "ERROR: Ex5/binary-shielder-main/patched-unsigned.apk n’a pas été généré (arrêt)."
-	exit 1
-fi
-
-# sanity check: avoid signing an invalid/empty zip
-if ! unzip -l Ex5/binary-shielder-main/patched-unsigned.apk | grep "AndroidManifest.xml" >/dev/null; then
-	echo "ERROR: APK invalide: AndroidManifest.xml manquant dans patched-unsigned.apk (arrêt)."
-	exit 1
-fi
-
-# sign
-APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
-ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
-if [ -z "$APKSIGNER" ] || [ -z "$ZIPALIGN" ]; then
-	echo "ERROR: build-tools introuvables (apksigner/zipalign). Vérifie Android SDK Build-Tools."
-	exit 1
-fi
-"$APKSIGNER" version
-
-ROOT="$PWD"
-TMPDIR="$(mktemp -d)"
-unzip -p Ex5/binary-shielder-main/patched-unsigned.apk resources.arsc > "$TMPDIR/resources.arsc"
-cp Ex5/binary-shielder-main/patched-unsigned.apk Ex5/binary-shielder-main/patched-unsigned-nocompress.apk
-zip -q -d Ex5/binary-shielder-main/patched-unsigned-nocompress.apk resources.arsc
-( cd "$TMPDIR" && zip -q -0 "$ROOT/Ex5/binary-shielder-main/patched-unsigned-nocompress.apk" resources.arsc )
-rm -rf "$TMPDIR"
-
-"$ZIPALIGN" -p 4 Ex5/binary-shielder-main/patched-unsigned-nocompress.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
-
-"$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey \
-	--ks-pass pass:android --key-pass pass:android \
-	--out Ex5/binary-shielder-main/patched-signed.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
-
-adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
-adb logcat -c
-adb shell am start -n com.example.mascot.binary/com.example.mascot.MainActivity >/dev/null || true
-sleep 3
-adb logcat -d | grep "Shielder" || true
-BASH
-```
 
 ## Branche de rendu
 

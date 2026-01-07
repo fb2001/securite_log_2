@@ -14,7 +14,7 @@ Le détecteur a été implémenté en Java dans le projet Android `mascot`, puis
 
 Le code source du détecteur est ici : [mascot/app/src/main/java/com/example/mascot/security/SecurityDetectorJava.java](mascot/app/src/main/java/com/example/mascot/security/SecurityDetectorJava.java)
 
-L’APK d’entrée utilisée pour les tests s’appelle `app-binary.apk`. Elle n’est pas versionnée dans Git (artefact fourni par l’énoncé) : il faut la placer à la racine du dépôt avant d’exécuter les commandes.
+Remarque : l’énoncé fournit parfois une APK d’entrée externe (`app-binary.apk`). Dans ce dépôt, les démonstrations et preuves sont reproductibles sans cet artefact (on travaille à partir des dossiers Apktool inclus dans `tp-smali-mascot/`).
 
 La décompilation Apktool qui contient le Smali du détecteur est dans : [tp-smali-mascot/mascot-decoded/](tp-smali-mascot/mascot-decoded/)
 
@@ -95,19 +95,17 @@ L’automatisation demandée (modifier une APK quelconque en injectant les déte
 
 Le projet utilise ANTLR pour générer un parser Smali ce qui permet de travailler proprement via AST.
 
-Commandes :
+Commande recommandée (ZIP-friendly) :
 
 ```bash
-cd Ex5/binary-shielder-main
-npm install
-npm run generate-parser
-APK_IN="$PWD/../../app-binary.apk"
-if [ ! -f "$APK_IN" ]; then
-	echo "ERROR: APK d’entrée introuvable: $APK_IN"
-	echo "Place ton APK cible à la racine (app-binary.apk) ou modifie APK_IN."
-	exit 1
-fi
+chmod +x ./run_ex5.sh
+./run_ex5.sh
 ```
+
+Notes importantes pour la correction :
+* `run_ex5.sh` détecte automatiquement l’Android SDK (via `ANDROID_HOME`, `ANDROID_SDK_ROOT`, ou `~/Library/Android/sdk`) et génère `mascot/local.properties` au besoin.
+* Le script force Java 17 si disponible (sinon Gradle peut échouer avec une version de Java trop récente).
+* `npm run generate-parser` est un no-op (parser déjà présent dans le dépôt).
 
 ### Étape 2 — Paramétrage argument APK en entrée
 
@@ -137,13 +135,11 @@ Les fichiers `.smali` sont parcourus et parsés pour retrouver celui qui déclar
 
 Implémentation : [Ex5/binary-shielder-main/src/step5_find_activity_smali.ts](Ex5/binary-shielder-main/src/step5_find_activity_smali.ts)
 
-### Étape 6 — Injection via AST : après `invoke-super` dans `onCreate`
+### Étape 6 — Injection (preuve d’exécution du détecteur)
 
-Une fois le fichier Smali de l’activité launcher trouvé, l’outil parse la classe en AST, localise `onCreate`, cherche le `invoke-super->onCreate(...)` puis injecte un sous graphe d’instructions juste après. Le sous graphe injecté est construit en parsant un snippet Smali plutôt que de créer les noeuds à la main, comme recommandé par l’énoncé.
+L’objectif de l’injection est de prouver que le détecteur est exécuté pendant l’exécution de l’app. Dans notre cible (`mascot`), la méthode `verifierSecurite()` appelle déjà `getSecurityDiagnostics(...)` : l’outil ajoute juste après un `Log.d("Shielder", diagnostic.toString())`.
 
 Implémentation : [Ex5/binary-shielder-main/src/step6_injection_appel.ts](Ex5/binary-shielder-main/src/step6_injection_appel.ts)
-
-Pour la vérification, l’injection loggue un message avec le tag `Shielder` et appelle `getSecurityDiagnostics(...)` du détecteur.
 
 ### Étape 7 — Reconstruction de l’APK
 
@@ -206,49 +202,14 @@ adb logcat | grep "Shielder"
 
 ### Validation sur émulateur (preuve Ex5)
 
-Pour l’automatisation (binary-shielder), le test consiste à installer l’APK générée (signée), lancer l’application, puis vérifier que les logs `Shielder` apparaissent (preuve que l’appel injecté dans `onCreate` a été exécuté).
+Le test Ex5 (automatisation) est entièrement reproductible avec une seule commande (build + patch + signature + install + log).
 
 ```bash
-adb devices
-adb uninstall com.example.mascot.binary || true
-adb logcat -c
-
-# Build (outil) -> patched-unsigned.apk
-# IMPORTANT: l’APK d’entrée (fournie par l’énoncé) doit être placée à la racine du dépôt.
-APK_IN="$PWD/app-binary.apk"
-if [ ! -f "$APK_IN" ]; then
-	echo "ERROR: APK d’entrée introuvable: $APK_IN"
-	echo "Place ton APK cible à la racine (app-binary.apk) ou modifie APK_IN."
-	exit 1
-fi
-
-npm --prefix Ex5/binary-shielder-main install
-npm --prefix Ex5/binary-shielder-main run generate-parser
-npm --prefix Ex5/binary-shielder-main run start -- --apk "$APK_IN" --detector "$PWD/Ex5/binary-shielder-main/SecurityDetectorJava.smali"
-
-# Signature -> patched-signed.apk
-APKSIGNER="$(ls ~/Library/Android/sdk/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
-ZIPALIGN="$(ls ~/Library/Android/sdk/build-tools/*/zipalign 2>/dev/null | sort -V | tail -n 1)"
-"$APKSIGNER" version
-
-ROOT="$PWD"
-TMPDIR="$(mktemp -d)"
-unzip -p Ex5/binary-shielder-main/patched-unsigned.apk resources.arsc > "$TMPDIR/resources.arsc"
-cp Ex5/binary-shielder-main/patched-unsigned.apk Ex5/binary-shielder-main/patched-unsigned-nocompress.apk
-zip -q -d Ex5/binary-shielder-main/patched-unsigned-nocompress.apk resources.arsc
-( cd "$TMPDIR" && zip -q -0 "$ROOT/Ex5/binary-shielder-main/patched-unsigned-nocompress.apk" resources.arsc )
-rm -rf "$TMPDIR"
-
-"$ZIPALIGN" -p 4 Ex5/binary-shielder-main/patched-unsigned-nocompress.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
-
-"$APKSIGNER" sign --ks ~/.android/debug.keystore --ks-key-alias androiddebugkey \
-	--ks-pass pass:android --key-pass pass:android \
-	--out Ex5/binary-shielder-main/patched-signed.apk Ex5/binary-shielder-main/patched-unsigned-aligned.apk
-
-adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
-adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
-adb logcat | grep "Shielder"
+chmod +x ./run_ex5.sh
+./run_ex5.sh
 ```
+
+Preuve attendue : une ligne `D Shielder: {...}` dans la sortie (map des diagnostics).
 
 ## Branche de rendu
 
