@@ -148,6 +148,8 @@ adb logcat | grep "Shielder"
 Générer l’APK patchée, la signer, puis l’installer :
 
 ```bash
+# Important (macOS Terminal = zsh) : exécute ce bloc sous bash pour éviter les erreurs de collage (prompt ">")
+bash <<'BASH'
 set -euo pipefail
 
 adb uninstall com.example.mascot.binary || true
@@ -209,6 +211,7 @@ adb install -r --no-incremental Ex5/binary-shielder-main/patched-signed.apk
 adb shell monkey -p com.example.mascot.binary -c android.intent.category.LAUNCHER 1
 adb logcat -c
 adb logcat | grep "Shielder"
+BASH
 ```
 
 ## Branche de rendu
