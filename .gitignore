@@ -3,10 +3,24 @@
 *.idsig
 *.dex
 
+# --- Node / JS ---
+**/node_modules/
+
+# --- Gradle / Android ---
+**/.gradle/
+**/build/
+
+# --- IDE ---
+.idea/
+
 # --- Decompiled outputs (keep only if you want to track) ---
 # Uncomment next line if you DON'T want to version decoded folders
 # *-decoded/
 # */dist/
+
+# Keep tp-smali-mascot/mascot-decoded tracked, but ignore Ex5 local decode outputs
+Ex5/binary-shielder-main/decoded/
+Ex5/binary-shielder-main/decoded_old/
 
 # --- Keys / secrets ---
 *.keystore

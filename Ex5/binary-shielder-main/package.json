@@ -1,0 +1,13 @@
+{
+  "name": "binary-shielder-main",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate-parser": "node -e \"console.log('Parser already generated (committed in dist/ and src/lib/). Nothing to do.');\"",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "antlr4ng": "^3.0.16",
+    "fast-xml-parser": "^4.3.6"
+  }
+}
